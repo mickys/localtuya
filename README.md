@@ -184,3 +184,62 @@ TradeFace, for being the only one to provide the correct code for communication 
 sean6541, for the working (standard) Python Handler for Tuya devices.
 
 postlund, for the ideas, for coding 95% of the refactoring and boosting the quality of this repo to levels hard to imagine (by me, at least) and teaching me A LOT of how things work in Home Assistant.
+
+
+# 5 - Smart Power Meter - ZMAi-90 
+
+`Hardware - WB3S`
+
+`P\N - 2.01.01.00202`
+
+
+
+```yaml
+localtuya:
+  - host: 192.168.1.20
+    device_id: <>
+    local_key: <>
+    friendly_name: Smart Power Meter 1
+    protocol_version: "3.3"
+    entities:
+      - platform: sensor
+        friendly_name: Smart Power Meter 1 Watt Counter
+        id: 1
+        scaling: 0.01 # Optional
+        device_class: power # Optional
+        unit_of_measurement: "kWh" # Optional
+
+      - platform: sensor
+        friendly_name: Smart Power Meter 1 Voltage
+        id: 2
+        scaling: 0.1 # Optional
+        device_class: voltage # Optional
+        unit_of_measurement: "V" # Optional
+
+      - platform: sensor
+        friendly_name: Smart Power Meter 1 Amps
+        id: 3
+        scaling: 0.001 # Optional
+        device_class: current # Optional
+        unit_of_measurement: "A" # Optional
+
+      - platform: sensor
+        friendly_name: Smart Power Meter 1 Watts
+        id: 4
+        scaling: 1 # Optional
+        device_class: energy # Optional
+        unit_of_measurement: "Watt" # Optional
+
+utility_meter:
+  energy:
+    source: sensor.smart_power_meter_1_watt_counter
+    cycle: monthly
+
+sensor:
+  - platform: integration
+    source: sensor.smart_power_meter_1_watts
+    name: energy_spent
+    unit_prefix: k
+    round: 2
+
+```

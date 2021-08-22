@@ -556,6 +556,34 @@ class TuyaProtocol(asyncio.Protocol, ContextualLogger):
         if not isinstance(payload, str):
             payload = payload.decode()
         self.debug("Decrypted payload: %s", payload)
+
+        if payload == "":
+            self.debug("Empty payload: %s", payload)
+            return json.loads("{}");
+
+        data = json.loads(payload)
+        try:
+            if "dps" in data and "6" in data["dps"]:
+                self.debug("Got DPS 6 payload: %s", data)
+                v = base64.b64decode(data["dps"]["6"])
+                self.debug("DPS 6 string %s", data["dps"]["6"])
+                self.debug("DPS 6 value: %s", v)
+
+                # volts
+                data["dps"]["2"] = int.from_bytes(v[0:2], "big")
+                # amps
+                data["dps"]["3"] = int.from_bytes(v[2:5], "big")
+                # watts
+                data["dps"]["4"] = int.from_bytes(v[5:8], "big")
+
+                self.debug("DPS 6 data: %s", data)
+
+                return data
+                
+        except binascii.Error:
+            pass
+
+
         return json.loads(payload)
 
     def _generate_payload(self, command, data=None):
